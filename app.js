@@ -210,7 +210,7 @@ app.get('/rank-keys', async (req, res) => {
 const { data, error } = await supabase
     .from('metrics')
     .select('user_github, quant_keys')
-    .order('quant_scrow', { ascending: false })
+    .order('quant_keys', { ascending: false })
     .limit(10)
 
     if (error) {
