@@ -80,7 +80,7 @@ app.get('/metrics/ranking', async (req, res) => {
     try {
         const { data, error } = await supabase
             .from('metrics')
-            .select('*')
+            .select('user_github, quant_clicks, quant_dist, quant_scrow, quant_keys')
             .order('quant_clicks', { ascending: false })
             .order('quant_dist', { ascending: false })
 
@@ -94,10 +94,10 @@ app.get('/metrics/ranking', async (req, res) => {
     }
 })
 
-app.get('/user-rank-clicks/:id', async (req, res) => {
-    const { id } = req.params
-    const { data, error } = await supabase.query('SELECT * FROM metrics WHERE id = $1', [id])
-    
+app.get('/user-rank-clicks/:user_github', async (req, res) => {
+    const { user_github } = req.params
+   const { data, error } = await supabase
+    .rpc('get_user_rank_clicks', { target_user: user_github })
     if (error) {
         res.status(500).send(error)
     } else {
@@ -108,8 +108,86 @@ app.get('/user-rank-clicks/:id', async (req, res) => {
 app.get('/rank-clicks', async (req, res) => {
 const { data, error } = await supabase
     .from('metrics')
-    .select('*')
+    .select('user_github, quant_clicks')
     .order('quant_clicks', { ascending: false })
+    .limit(10)
+
+    if (error) {
+        res.status(500).send(error)
+    } else {
+        res.status(200).send(data)
+    }
+})
+
+app.get('/user-rank-dist/:user_github', async (req, res) => {
+    const { user_github } = req.params
+    const { data, error } = await supabase
+    .rpc('get_user_rank_dist', { target_user: user_github })
+    
+    if (error) {
+        res.status(500).send(error)
+    } else {
+        res.status(200).send(data)
+    }
+})
+
+app.get('/rank-dist', async (req, res) => {
+const { data, error } = await supabase
+    .from('metrics')
+    .select('user_github, quant_dist')
+    .order('quant_dist', { ascending: false })
+    .limit(10)
+
+    if (error) {
+        res.status(500).send(error)
+    } else {
+        res.status(200).send(data)
+    }
+})
+
+app.get('/user-rank-scrow/:user_github', async (req, res) => {
+    const { user_github } = req.params
+    const { data, error } = await supabase
+    .rpc('get_user_rank_scrow', { target_user: user_github })
+    
+    if (error) {
+        res.status(500).send(error)
+    } else {
+        res.status(200).send(data)
+    }
+})
+
+app.get('/rank-scrow', async (req, res) => {
+const { data, error } = await supabase
+    .from('metrics')
+    .select('user_github, quant_scrow')
+    .order('quant_scrow', { ascending: false })
+    .limit(10)
+
+    if (error) {
+        res.status(500).send(error)
+    } else {
+        res.status(200).send(data)
+    }
+})
+
+app.get('/user-rank-keys/:user_github', async (req, res) => {
+    const { user_github } = req.params
+    const { data, error } = await supabase
+    .rpc('get_user_rank_keys', { target_user: user_github })
+    
+    if (error) {
+        res.status(500).send(error)
+    } else {
+        res.status(200).send(data)
+    }
+})
+
+app.get('/rank-keys', async (req, res) => {
+const { data, error } = await supabase
+    .from('metrics')
+    .select('user_github, quant_keys')
+    .order('quant_scrow', { ascending: false })
     .limit(10)
 
     if (error) {
