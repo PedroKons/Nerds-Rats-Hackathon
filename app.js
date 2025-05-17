@@ -11,16 +11,16 @@ app.post('/metrics', async (req, res) => {
         return res.status(400).send({ error: 'Request body is required' })
     }
 
-    if (!body.user_github || !body.email || !body.quant_clicks || !body.quant_dist) {
+    if (!body.user_github || !body.email || !body.quant_clicks || !body.quant_dist || !body.quant_scrow || !body.quant_keys) {
         return res.status(400).send({ error: 'Missing required fields' })
     }
 
-    if (typeof body.user_github !== 'string' || typeof body.email !== 'string' || typeof body.quant_clicks !== 'number' || typeof body.quant_dist !== 'number') {
+    if (typeof body.user_github !== 'string' || typeof body.email !== 'string' || typeof body.quant_clicks !== 'number' || typeof body.quant_dist !== 'number' || typeof body.quant_scrow !== 'number' || typeof body.quant_keys !== 'number') {
         return res.status(400).send({ error: 'Invalid data types' })
     }
 
-    if (body.quant_clicks < 0 || body.quant_dist < 0) {
-        return res.status(400).send({ error: 'quant_clicks and quant_dist must be positive numbers' })
+    if (body.quant_clicks < 0 || body.quant_dist < 0 || body.quant_scrow < 0 || body.quant_keys < 0) {
+        return res.status(400).send({ error: 'quant_clicks, quant_dist, quant_scrow and quant_keys must be positive numbers' })
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -47,7 +47,9 @@ app.post('/metrics', async (req, res) => {
                 .from('metrics')
                 .update({
                     quant_clicks: existingUser.quant_clicks + body.quant_clicks,
-                    quant_dist: existingUser.quant_dist + body.quant_dist
+                    quant_dist: existingUser.quant_dist + body.quant_dist,
+                    quant_scrow: existingUser.quant_scrow + body.quant_scrow,
+                    quant_keys: existingUser.quant_keys + body.quant_keys
                 })
                 .eq('email', body.email)
                 .select()
@@ -81,8 +83,11 @@ app.get('/metrics/ranking', async (req, res) => {
         const { data, error } = await supabase
             .from('metrics')
             .select('*')
-            .order('quant_clicks', { ascending: false })
+            .order('quant_keys', { ascending: false })
+            .order('quant_scrow', { ascending: false })
             .order('quant_dist', { ascending: false })
+            .order('quant_clicks', { ascending: false })
+
 
         if (error) {
             return res.status(500).send({ error: error.message })
