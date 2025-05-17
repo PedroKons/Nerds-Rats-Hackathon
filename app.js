@@ -16,23 +16,28 @@ app.post('/metrics', async (req, res) => {
 
     // Validate if body exists
     if (!body) {
+        console.log('Request body is required')
         return res.status(400).send({ error: 'Request body is required' })
     }
 
     if (!body.user_github || !body.email || !body.quant_clicks || !body.quant_dist || !body.quant_scrow || !body.quant_keys) {
+        console.log('Missing required fields')
         return res.status(400).send({ error: 'Missing required fields' })
     }
 
     if (typeof body.user_github !== 'string' || typeof body.email !== 'string' || typeof body.quant_clicks !== 'number' || typeof body.quant_dist !== 'number' || typeof body.quant_scrow !== 'number' || typeof body.quant_keys !== 'number') {
+        console.log('Invalid data types')
         return res.status(400).send({ error: 'Invalid data types' })
     }
 
     if (body.quant_clicks < 0 || body.quant_dist < 0 || body.quant_scrow < 0 || body.quant_keys < 0) {
+        console.log('Invalid data types')
         return res.status(400).send({ error: 'quant_clicks, quant_dist, quant_scrow and quant_keys must be positive numbers' })
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(body.email)) {
+        console.log('Invalid email format')
         return res.status(400).send({ error: 'Invalid email format' })
     }
 
@@ -44,6 +49,7 @@ app.post('/metrics', async (req, res) => {
         .single()
 
     if (searchError && searchError.code !== 'PGRST116') {
+        console.log('Error searching for user')
         return res.status(500).send({ error: searchError.message })
     }
 
@@ -63,8 +69,10 @@ app.post('/metrics', async (req, res) => {
                 .select()
 
             if (error) {
+                console.log('Error updating user')
                 return res.status(500).send({ error: error.message })
             }
+            console.log('User updated', data)
             result = data
         } else {
             // Insert new user
@@ -74,13 +82,16 @@ app.post('/metrics', async (req, res) => {
                 .select()
 
             if (error) {
+                console.log('Error inserting user')
                 return res.status(500).send({ error: error.message })
             }
+            console.log('User inserted', data)
             result = data
         }
 
         return res.status(200).send(result)
     } catch (error) {
+        console.log('Error in the post request', error)
         return res.status(500).send({ error: error.message })
     }
 })
