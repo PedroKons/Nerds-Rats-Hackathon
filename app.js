@@ -1,7 +1,15 @@
 import Fastify from 'fastify'
 import supabase from './supabase.js'
+import dotenv from 'dotenv'
+import cors from 'cors'
+
+dotenv.config()
 
 const app = Fastify()
+
+await app.register(cors, {
+    origin: true
+})
 
 app.post('/metrics', async (req, res) => {
     const { body } = req
@@ -124,11 +132,13 @@ const { data, error } = await supabase
     }
 })
 
-app.listen({ port: 3000 }, (err) => {
+const PORT = process.env.PORT || 3000
+
+app.listen({ port: PORT, host: '0.0.0.0' }, (err) => {
     if (err) {
         console.error('Error starting server:', err)
         process.exit(1)
     }
-    console.log('Server is running on port 3000')
+    console.log(`Server is running on port ${PORT}`)
 })
 
