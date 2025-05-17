@@ -1,7 +1,7 @@
 import Fastify from 'fastify'
 import supabase from './supabase.js'
 import dotenv from 'dotenv'
-import cors from 'cors'
+import cors from '@fastify/cors'
 
 dotenv.config()
 
