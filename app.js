@@ -75,6 +75,25 @@ app.post('/metrics', async (req, res) => {
     }
 })
 
+// Endpoint para buscar métricas ordenadas
+app.get('/metrics/ranking', async (req, res) => {
+    try {
+        const { data, error } = await supabase
+            .from('metrics')
+            .select('*')
+            .order('quant_clicks', { ascending: false })
+            .order('quant_dist', { ascending: false })
+
+        if (error) {
+            return res.status(500).send({ error: error.message })
+        }
+
+        return res.status(200).send(data)
+    } catch (error) {
+        return res.status(500).send({ error: error.message })
+    }
+})
+
 app.get('/user-rank-clicks/:id', async (req, res) => {
     const { id } = req.params
     const { data, error } = await supabase.query('SELECT * FROM metrics WHERE id = $1', [id])
