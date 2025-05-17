@@ -21,7 +21,7 @@ app.post('/metrics', async (req, res) => {
     }
 
     if (!body.user_github || !body.email || !body.quant_clicks || !body.quant_dist || !body.quant_scrow || !body.quant_keys) {
-        console.log('Missing required fields')
+        console.log('Missing required fields', body)
         return res.status(400).send({ error: 'Missing required fields' })
     }
 
@@ -96,6 +96,7 @@ app.post('/metrics', async (req, res) => {
     }
 })
 
+/*
 // Endpoint para buscar métricas ordenadas
 app.get('/metrics/ranking', async (req, res) => {
     try {
@@ -114,6 +115,7 @@ app.get('/metrics/ranking', async (req, res) => {
         return res.status(500).send({ error: error.message })
     }
 })
+*/
 
 app.get('/user-rank-clicks/:user_github', async (req, res) => {
     const { user_github } = req.params
