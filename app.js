@@ -21,7 +21,7 @@ app.post('/metrics', async (req, res) => {
     }
 
     if (!body.user_github || !body.email || !body.quant_clicks || !body.quant_dist || !body.quant_scrow || !body.quant_keys) {
-        console.log('Missing required fields')
+        console.log('Missing required fields', body)
         return res.status(400).send({ error: 'Missing required fields' })
     }
 
@@ -97,26 +97,30 @@ app.post('/metrics', async (req, res) => {
 })
 
 // Endpoint para buscar métricas ordenadas
-app.get('/metrics/ranking', async (req, res) => {
-    try {
-        const { data, error } = await supabase
-            .from('metrics')
-            .select('*')
-            .order('quant_keys', { ascending: false })
-            .order('quant_scrow', { ascending: false })
-            .order('quant_dist', { ascending: false })
-            .order('quant_clicks', { ascending: false })
+// app.get('/metrics/ranking', async (req, res) => {
+//     try {
+//         const { data, error } = await supabase
+//             .from('metrics')
+//             .select(`
+//                 email,
+//                 sum(quant_keys) as total_keys,
+//                 sum(quant_dist) as total_dist,
+//                 sum(quant_clicks) as total_clicks,
+//                 sum(quant_scrow) as total_scrow,
+//                 (sum(quant_keys) * 4 + sum(quant_dist) * 3 + sum(quant_clicks) * 2 + sum(quant_scrow) * 1) as total_score
+//             `)
+//             .group('email')
+//             .order('total_score', { ascending: false })
 
+//         if (error) {
+//             return res.status(500).send({ error: error.message })
+//         }
 
-        if (error) {
-            return res.status(500).send({ error: error.message })
-        }
-
-        return res.status(200).send(data)
-    } catch (error) {
-        return res.status(500).send({ error: error.message })
-    }
-})
+//         return res.status(200).send(data)
+//     } catch (error) {
+//         return res.status(500).send({ error: error.message })
+//     }
+// })
 
 app.get('/user-rank-clicks/:id', async (req, res) => {
     const { id } = req.params
