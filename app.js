@@ -20,10 +20,10 @@ app.post('/metrics', async (req, res) => {
         return res.status(400).send({ error: 'Request body is required' })
     }
 
-    if (!body.user_github || !body.email || !body.quant_clicks || !body.quant_dist || !body.quant_scrow || !body.quant_keys) {
-        console.log('Missing required fields', body)
-        return res.status(400).send({ error: 'Missing required fields' })
-    }
+    // if (!body.user_github || !body.email || !body.quant_clicks || !body.quant_dist || !body.quant_scrow || !body.quant_keys) {
+    //     console.log('Missing required fields', body)
+    //     return res.status(400).send({ error: 'Missing required fields' })
+    // }
 
     if (typeof body.user_github !== 'string' || typeof body.email !== 'string' || typeof body.quant_clicks !== 'number' || typeof body.quant_dist !== 'number' || typeof body.quant_scrow !== 'number' || typeof body.quant_keys !== 'number') {
         console.log('Invalid data types')
@@ -32,7 +32,7 @@ app.post('/metrics', async (req, res) => {
 
     if (body.quant_clicks < 0 || body.quant_dist < 0 || body.quant_scrow < 0 || body.quant_keys < 0) {
         console.log('Invalid data types')
-        return res.status(400).send({ error: 'quant_clicks, quant_dist, quant_scrow and quant_keys must be positive numbers' })
+        return res.status(400).send({ error: 'quant_clicks, quant_dist, quant_scrow and quant_keys must be non-negative numbers' })
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -96,36 +96,31 @@ app.post('/metrics', async (req, res) => {
     }
 })
 
+/*
 // Endpoint para buscar métricas ordenadas
-// app.get('/metrics/ranking', async (req, res) => {
-//     try {
-//         const { data, error } = await supabase
-//             .from('metrics')
-//             .select(`
-//                 email,
-//                 sum(quant_keys) as total_keys,
-//                 sum(quant_dist) as total_dist,
-//                 sum(quant_clicks) as total_clicks,
-//                 sum(quant_scrow) as total_scrow,
-//                 (sum(quant_keys) * 4 + sum(quant_dist) * 3 + sum(quant_clicks) * 2 + sum(quant_scrow) * 1) as total_score
-//             `)
-//             .group('email')
-//             .order('total_score', { ascending: false })
+app.get('/metrics/ranking', async (req, res) => {
+    try {
+        const { data, error } = await supabase
+            .from('metrics')
+            .select('*')
+            .order('quant_clicks', { ascending: false })
 
-//         if (error) {
-//             return res.status(500).send({ error: error.message })
-//         }
 
-//         return res.status(200).send(data)
-//     } catch (error) {
-//         return res.status(500).send({ error: error.message })
-//     }
-// })
+        if (error) {
+            return res.status(500).send({ error: error.message })
+        }
 
-app.get('/user-rank-clicks/:id', async (req, res) => {
-    const { id } = req.params
-    const { data, error } = await supabase.query('SELECT * FROM metrics WHERE id = $1', [id])
-    
+        return res.status(200).send(data)
+    } catch (error) {
+        return res.status(500).send({ error: error.message })
+    }
+})
+*/
+
+app.get('/user-rank-clicks/:user_github', async (req, res) => {
+    const { user_github } = req.params
+   const { data, error } = await supabase
+    .rpc('get_user_rank_clicks', { target_user: user_github })
     if (error) {
         res.status(500).send(error)
     } else {
@@ -136,8 +131,86 @@ app.get('/user-rank-clicks/:id', async (req, res) => {
 app.get('/rank-clicks', async (req, res) => {
 const { data, error } = await supabase
     .from('metrics')
-    .select('*')
+    .select('user_github, quant_clicks')
     .order('quant_clicks', { ascending: false })
+    .limit(10)
+
+    if (error) {
+        res.status(500).send(error)
+    } else {
+        res.status(200).send(data)
+    }
+})
+
+app.get('/user-rank-dist/:user_github', async (req, res) => {
+    const { user_github } = req.params
+    const { data, error } = await supabase
+    .rpc('get_user_rank_dist', { target_user: user_github })
+    
+    if (error) {
+        res.status(500).send(error)
+    } else {
+        res.status(200).send(data)
+    }
+})
+
+app.get('/rank-dist', async (req, res) => {
+const { data, error } = await supabase
+    .from('metrics')
+    .select('user_github, quant_dist')
+    .order('quant_dist', { ascending: false })
+    .limit(10)
+
+    if (error) {
+        res.status(500).send(error)
+    } else {
+        res.status(200).send(data)
+    }
+})
+
+app.get('/user-rank-scrow/:user_github', async (req, res) => {
+    const { user_github } = req.params
+    const { data, error } = await supabase
+    .rpc('get_user_rank_scrow', { target_user: user_github })
+    
+    if (error) {
+        res.status(500).send(error)
+    } else {
+        res.status(200).send(data)
+    }
+})
+
+app.get('/rank-scrow', async (req, res) => {
+const { data, error } = await supabase
+    .from('metrics')
+    .select('user_github, quant_scrow')
+    .order('quant_scrow', { ascending: false })
+    .limit(10)
+
+    if (error) {
+        res.status(500).send(error)
+    } else {
+        res.status(200).send(data)
+    }
+})
+
+app.get('/user-rank-keys/:user_github', async (req, res) => {
+    const { user_github } = req.params
+    const { data, error } = await supabase
+    .rpc('get_user_rank_keys', { target_user: user_github })
+    
+    if (error) {
+        res.status(500).send(error)
+    } else {
+        res.status(200).send(data)
+    }
+})
+
+app.get('/rank-keys', async (req, res) => {
+const { data, error } = await supabase
+    .from('metrics')
+    .select('user_github, quant_keys')
+    .order('quant_scrow', { ascending: false })
     .limit(10)
 
     if (error) {
@@ -156,4 +229,3 @@ app.listen({ port: PORT, host: '0.0.0.0' }, (err) => {
     }
     console.log(`Server is running on port ${PORT}`)
 })
-
