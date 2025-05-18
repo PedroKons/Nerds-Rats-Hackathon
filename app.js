@@ -20,11 +20,6 @@ app.post('/metrics', async (req, res) => {
         return res.status(400).send({ error: 'Request body is required' })
     }
 
-    // if (!body.user_github || !body.email || !body.quant_clicks || !body.quant_dist || !body.quant_scrow || !body.quant_keys) {
-    //     console.log('Missing required fields', body)
-    //     return res.status(400).send({ error: 'Missing required fields' })
-    // }
-
     if (typeof body.user_github !== 'string' || typeof body.email !== 'string' || typeof body.quant_clicks !== 'number' || typeof body.quant_dist !== 'number' || typeof body.quant_scrow !== 'number' || typeof body.quant_keys !== 'number') {
         console.log('Invalid data types')
         return res.status(400).send({ error: 'Invalid data types' })
@@ -41,7 +36,6 @@ app.post('/metrics', async (req, res) => {
         return res.status(400).send({ error: 'Invalid email format' })
     }
 
-    //Validar se se existe um usuario com o mesmo email
     const { data: existingUser, error: searchError } = await supabase
         .from('metrics')
         .select('*')
