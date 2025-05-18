@@ -90,26 +90,21 @@ app.post('/metrics', async (req, res) => {
     }
 })
 
-/*
-// Endpoint para buscar métricas ordenadas
-app.get('/metrics/ranking', async (req, res) => {
-    try {
-        const { data, error } = await supabase
-            .from('metrics')
-            .select('*')
-            .order('quant_clicks', { ascending: false })
+//Uma rota que retorna usuario pelo email
+app.get('/user-by-email/:email', async (req, res) => {
+    const { email } = req.params
+    const { data, error } = await supabase
+    .from('metrics')
+    .select('*')
+    .eq('email', email)
 
-
-        if (error) {
-            return res.status(500).send({ error: error.message })
-        }
-
-        return res.status(200).send(data)
-    } catch (error) {
-        return res.status(500).send({ error: error.message })
+    if (error) {
+        res.status(500).send(error)
+    } else {
+        res.status(200).send(data)
+        return data
     }
 })
-*/
 
 app.get('/user-rank-clicks/:user_github', async (req, res) => {
     const { user_github } = req.params
@@ -214,7 +209,7 @@ const { data, error } = await supabase
     }
 })
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 5000
 
 app.listen({ port: PORT, host: '0.0.0.0' }, (err) => {
     if (err) {
