@@ -13,7 +13,7 @@ npm install
    - Crie um arquivo `.env` na raiz do projeto
    - Adicione as seguintes variáveis:
      ```
-     PORT=3000 # Porta opcional, padrão é 3000
+     PORT=5000 # Porta opcional, padrão é 5000
      SUPABASE_URL=sua_url_do_supabase
      SUPABASE_KEY=sua_chave_do_supabase
      ```
@@ -38,6 +38,16 @@ Registra ou atualiza métricas de um usuário.
 **Respostas:**
 - 200: Métricas registradas com sucesso
 - 400: Dados inválidos
+- 500: Erro interno do servidor
+
+### GET /user-by-email/:email
+Retorna os dados do usuário pelo email.
+
+**Parâmetros:**
+- `email`: Email do usuário
+
+**Respostas:**
+- 200: Dados do usuário
 - 500: Erro interno do servidor
 
 ### GET /user-rank-clicks/:user_github
@@ -121,4 +131,4 @@ Retorna o top 10 usuários com mais teclas pressionadas.
 npm start
 ```
 
-O servidor estará disponível em `http://localhost:3000` (ou na porta especificada no arquivo .env). 
+O servidor estará disponível em `http://localhost:5000` (ou na porta especificada no arquivo .env). 
